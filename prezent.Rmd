@@ -1,0 +1,212 @@
+---
+title: "Data science internship audition project"
+author: "Izabela Kosmala"
+output: slidy_presentation
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(vioplot)
+data <- read_csv("C:/Users/HP/Desktop/wa¿ne/audition_project/data.csv")
+data$learner_id=factor(data$learner_id)
+data$unit=factor(data$unit)
+aov(data$avg_score~data$unit)
+```
+
+## Introduction
+
+I want to present the results of my work.
+
+
+The analysis refer an influence various factors on averange percent score archieved by students who use the course book.  
+
+
+So let's start.
+
+## Chapter
+```{r pressure,echo=FALSE,warning=F}
+ggplot(data = data) + 
+  geom_bar(mapping = aes(x = unit)) +
+  coord_flip() +
+  ggtitle("Number of people who choose each unit")
+```
+
+I checked which units are the most popular. The results you can see at the boxplot.
+
+We can see that some of units are less popular then other. This suggests that they need to introduce amendments, maybe their contest or title. 
+
+The diagram shows as that the farther in course the less people continue learning. Maybe some discourages they. I suggest make the book more atractive.
+
+## Chapter2
+
+Let's check if units has an statistically significiant influence. We use ANOVA.
+
+
+```{r data, echo = FALSE,warning=F}
+summary(aov(data$avg_score~data$unit))
+```
+
+The fact that p-value < 0,05 say us: YES.
+
+## Chapter3
+
+We can see how units influence at averange score. The punkt says about median, the lines are from min to max. The diagram shows which chapters are worst then other like ex. 11. On the other hand, it's obviously that the further units are more difficult.
+
+```{r wykres, echo = FALSE, warning=FALSE}
+ggplot(data = data) + 
+  stat_summary(
+    mapping = aes(x = unit, y = avg_score),
+    fun.ymin = min,
+    fun.ymax = max,
+    fun.y = median
+  ) +  coord_flip()
+```
+ 
+## Teacher
+
+Now we examine how learning with teacher influence on results. 
+
+First, we use t-test.
+
+```{r data1, echo = F,warning=F}
+t.test(data$avg_score~data$in_course) 
+```
+
+The p-value < 0,05 says about we must reject the null hyphotesis about none influence. However the means calculate in the test are quite similar. If the different is appropriate for us we can teach people without teachers. But are some reason to continue learning with teacher.
+
+## Teacher2
+
+Look at a violinplot.
+
+```{r data2, echo = F,warning=F}
+    ggplot(data, aes(x=in_course, y=avg_score)) + 
+      geom_violin()
+```
+We notice that learning with teacher get better results - shape in upper part of chart. It is more effective method.
+
+## Teacher3
+
+```{r data3, echo = F,warning=F}
+count(group_by(data,in_course))
+
+```
+
+```{r wykres1,echo=FALSE,warning=F}
+ggplot(data = data) + 
+  geom_bar(mapping = aes(x = in_course)) +
+  coord_flip() +
+  ggtitle("Number of people who learn with teacher")
+```
+However the learning with teacher is the most popular and the difference in amount of people use another option are huge. Maybe some people need a motivation from other to do something regularly and someone who control their progress.
+
+## Advise from  experts
+
+Take an ANOVA to chech the statistical influence for score.
+```{r data4, echo = F,warning=F}
+summary(aov(data$avg_score~data$inv_rate))
+```
+The influence is real. Although, we didn't know it is possitive or negative.
+
+```{r data5, echo = F,warning=F}
+ggplot(data = data) + 
+  geom_point(mapping = aes(x = data$avg_score, y = data$inv_rate)) + 
+  facet_wrap(~data$in_course)
+```
+
+## Expert advise 2
+
+How we see at the diagram the advise from experts aren't the better. It's important to improve this. According to expert existing various the best style of studying for another people. Some learn more from visual, some from hearing etc. It's difficult to match workbook good for everyone.
+
+Let's check how much students use expert advice.
+
+```{r wykres2,echo=FALSE,warning=F}
+ggplot(data = data) + 
+  geom_bar(mapping = aes(x = cut(data$inv_rate,20))) +
+  coord_flip() +
+  ggtitle("How people uses the expert advice")
+```
+This is next reason to change the expert advice and ways to promote it. Maybe you should say more about the recommendations how to use workbook.
+
+## Country
+
+How is the course suited to each countries? Are the coutries influence for results? First, we use ANOVA again.
+
+```{r data6, echo = F,warning=F}
+summary(aov(data$avg_score~data$country))
+```
+
+We see again YES. 
+
+## Country2
+
+Let's see boxplot
+
+```{r data7, echo = F,warning=F}
+ggplot(data = data) + 
+  stat_summary(
+    mapping = aes(x = country, y = avg_score),
+    fun.ymin = min,
+    fun.ymax = max,
+    fun.y = median
+  ) +  coord_flip()
+```
+
+```{r data8, echo = F,warning=F}
+summarise(group_by(data,country),mean(avg_score,na.rm=T))
+```
+
+How we can see users from different countries has different results. Probably the workbook isn't suited to student's nationality. Diversity of cultures and national language sometimes make harder to learn english users from different countries in the same way. I suggest adapting course to nationality of user.
+
+
+## Country3
+
+Next questions: how many people from each country use the course?
+
+```{r data9, echo = F,warning=F}
+count(group_by(data,country))
+```
+
+## Country4 
+
+```{r wykres3,echo=FALSE,warning=F}
+ggplot(data = data) + 
+  geom_bar(mapping = aes(x = country)) +
+  coord_flip() +
+  ggtitle("Number of users from different country")
+```
+In some country from the course book use few person. The most users come from Turkey. I strongly recommend make some advertisemt campain in the country where the number of students is low.
+
+## Completion
+
+Now we test how degree of completion affect on results with anova
+
+```{r d2,echo=F,warning=F}
+summary(aov(data$avg_score~data$inv_rate)) 
+```
+The affection exist. Draw it.
+```{r d5,echo=F,warning=F}
+ggplot(data = data) + 
+  geom_point(mapping = aes(x = data$completion, y = data$avg_score))+
+  geom_smooth(mapping = aes(x = data$completion, y = data$avg_score))
+```
+
+Competion contests from units has slightly influence on data completion. I recommed improve the contests and excercises in course.
+
+## Missing Value
+
+```{r d1,echo=TRUE,warning=F}
+(nrow(data)-nrow(drop_na(data)))/nrow(data)
+```
+
+The missing value is only 0.01228018 % so collection data is effective.
+
+
+## Density
+```{r d4,echo=TRUE,warning=F}
+hist(data$avg_score,prob=T,main='Histogram of averange score',xlab='Averange scores')
+lines(density(data$avg_score,na.rm=T))
+```
+The density can help as build a model.
+The density look like density of beta distribution.
+
